@@ -23,34 +23,34 @@ TEST_FILES = [
     #     'path': './data/gen/m_no_quotes_52_col_0_256.csv',
     #     'name': 'M No Quotes, 52 col, 0-256 chars',
     # },
+    {
+        'path': './data/gen/xl_mix_quotes_12_col_0_32.csv',
+        'name': 'XL Mix Quotes, 12 col, 0-32 chars',
+    },
+    {
+        'path': './data/gen/xl_mix_quotes_2_col_0_12_many_rows.csv',
+        'name': 'XL Mix Quotes, 2 col, 0-12 chars, many rows',
+    },
+    {
+        'path': './data/gen/xl_no_quotes_52_col_0_256.csv',
+        'name': 'XL No Quotes, 52 col, 0-256 chars',
+    },
     # {
-    #     'path': './data/gen/xl_mix_quotes_12_col_0_32.csv',
-    #     'name': 'XL Mix Quotes, 12 col, 0-32 chars',
+    #     'path': './data/nfl.csv',
+    #     'name': 'nfl.csv',
     # },
     # {
-    #     'path': './data/gen/xl_mix_quotes_2_col_0_12_many_rows.csv',
-    #     'name': 'XL Mix Quotes, 2 col, 0-12 chars, many rows',
+    #     'path': './data/worldcitiespop.csv',
+    #     'name': 'worldcitiespop.csv',
     # },
     # {
-    #     'path': './data/gen/xl_no_quotes_52_col_0_256.csv',
-    #     'name': 'XL No Quotes, 52 col, 0-256 chars',
+    #     'path': './data/gtfs-mbta-stop-times.csv',
+    #     'name': 'mbta-stop-times.csv',
     # },
-    {
-        'path': './data/nfl.csv',
-        'name': 'nfl.csv',
-    },
-    {
-        'path': './data/worldcitiespop.csv',
-        'name': 'worldcitiespop.csv',
-    },
-    {
-        'path': './data/gtfs-mbta-stop-times.csv',
-        'name': 'mbta-stop-times.csv',
-    },
-    {
-        'path': './data/game.csv',
-        'name': 'game.csv',
-    },
+    # {
+    #     'path': './data/game.csv',
+    #     'name': 'game.csv',
+    # },
 ]
 PARSERS = [
     {'name': 'zcsv (zig)', 'path':  './src/zig/zig-out/bin/zcsv', 'bar_color': '#EBB101'},
