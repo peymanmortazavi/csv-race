@@ -7,34 +7,34 @@ from matplotlib.ticker import FuncFormatter
 
 
 TEST_FILES = [
-    {
-        'path': './data/gen/xs_mix_quotes_12_col_0_32.csv',
-        'name': 'XS Mix Quotes, 12 col, 0-32 chars',
-    },
-    {
-        'path': './data/gen/xs_no_quotes_52_col_0_256.csv',
-        'name': 'XS No Quotes, 52 col, 0-256 chars',
-    },
-    {
-        'path': './data/gen/m_mix_quotes_12_col_0_32.csv',
-        'name': 'M Mix Quotes, 12 col, 0-32 chars',
-    },
-    {
-        'path': './data/gen/m_no_quotes_52_col_0_256.csv',
-        'name': 'M No Quotes, 52 col, 0-256 chars',
-    },
-    {
-        'path': './data/gen/xl_mix_quotes_12_col_0_32.csv',
-        'name': 'XL Mix Quotes, 12 col, 0-32 chars',
-    },
-    {
-        'path': './data/gen/xl_mix_quotes_2_col_0_12_many_rows.csv',
-        'name': 'XL Mix Quotes, 2 col, 0-12 chars, many rows',
-    },
-    {
-        'path': './data/gen/xl_no_quotes_52_col_0_256.csv',
-        'name': 'XL No Quotes, 52 col, 0-256 chars',
-    },
+    # {
+    #     'path': './data/gen/xs_mix_quotes_12_col_0_32.csv',
+    #     'name': 'XS Mix Quotes, 12 col, 0-32 chars',
+    # },
+    # {
+    #     'path': './data/gen/xs_no_quotes_52_col_0_256.csv',
+    #     'name': 'XS No Quotes, 52 col, 0-256 chars',
+    # },
+    # {
+    #     'path': './data/gen/m_mix_quotes_12_col_0_32.csv',
+    #     'name': 'M Mix Quotes, 12 col, 0-32 chars',
+    # },
+    # {
+    #     'path': './data/gen/m_no_quotes_52_col_0_256.csv',
+    #     'name': 'M No Quotes, 52 col, 0-256 chars',
+    # },
+    # {
+    #     'path': './data/gen/xl_mix_quotes_12_col_0_32.csv',
+    #     'name': 'XL Mix Quotes, 12 col, 0-32 chars',
+    # },
+    # {
+    #     'path': './data/gen/xl_mix_quotes_2_col_0_12_many_rows.csv',
+    #     'name': 'XL Mix Quotes, 2 col, 0-12 chars, many rows',
+    # },
+    # {
+    #     'path': './data/gen/xl_no_quotes_52_col_0_256.csv',
+    #     'name': 'XL No Quotes, 52 col, 0-256 chars',
+    # },
     {
         'path': './data/nfl.csv',
         'name': 'nfl.csv',
@@ -55,9 +55,9 @@ TEST_FILES = [
 PARSERS = [
     {'name': 'zcsv (zig)', 'path':  './src/zig/zig-out/bin/zcsv', 'bar_color': '#EBB101'},
     {'name': 'zsc (c)', 'path': './src/c/zsv/count_fields', 'bar_color': '#9AC3B4'},
-    {'name': 'lazycsv (cpp)', 'path':  './src/cpp/lazycsv/count_csv', 'bar_color': '#9A89B3'},
-    {'name': 'simd-csv (rust)', 'path':  './src/rust/simd-csv/target/release/csv-race', 'bar_color': '#90ACC2'},
-    {'name': 'csv (rust)', 'path':  './src/rust/csv/target/release/csv_race', 'bar_color': '#C69B9C'},
+    {'name': 'lazycsv (cpp)', 'path':  './src/cpp/lazycsv/count_fields', 'bar_color': '#9A89B3'},
+    {'name': 'simd-csv (rust)', 'path':  './src/rust/simd-csv/target/release/count_fields', 'bar_color': '#90ACC2'},
+    {'name': 'csv (rust)', 'path':  './src/rust/csv/target/release/count_fields', 'bar_color': '#C69B9C'},
 ]
 POOP_PATH = '/home/peyman/Downloads/x86_64-linux-poop'
 
@@ -150,7 +150,7 @@ METRICS = {
 
 
 def capture_output(test_file: str) -> dict:
-    args = [POOP_PATH, '--color', 'never', '-d', '5000']
+    args = [POOP_PATH, '--color', 'never', '-d', '10000']
     for parser in PARSERS:
         path = parser['path']
         args.append(f'{path} {test_file}')
