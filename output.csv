@@ -1,0 +1,31 @@
+test,parser,wall_time,peak_rss,branch_misses,cache_misses,cache_references,instructions,cpu_cycles
+"XS No Quotes, Long Fields, Varied Size",zcsv,508us,823KB,426,253,1.47K,23.2K,24.4K
+"XS No Quotes, Long Fields, Varied Size",zsc,977us,1.82MB,3.41K,6.08K,18.0K,259K,258K
+"XS No Quotes, Long Fields, Varied Size",lazycsv,1.99ms,3.61MB,15.1K,18.4K,67.0K,2.84M,1.43M
+"XS No Quotes, Long Fields, Varied Size",simd-csv,1.43ms,2.20MB,4.84K,8.21K,25.8K,358K,342K
+"XS No Quotes, Long Fields, Varied Size",csv-core,1.61ms,2.17MB,4.73K,8.14K,27.0K,1.35M,702K
+"XS Mix, Med Fields, Short Size",zcsv,509us,807KB,232,218,901,4.98K,12.5K
+"XS Mix, Med Fields, Short Size",zsc,1.00ms,1.71MB,3.12K,6.05K,17.1K,140K,217K
+"XS Mix, Med Fields, Short Size",lazycsv,1.90ms,3.56MB,15.0K,18.2K,66.0K,2.57M,1.38M
+"XS Mix, Med Fields, Short Size",simd-csv,1.25ms,2.19MB,4.55K,8.11K,23.8K,316K,320K
+"XS Mix, Med Fields, Short Size",csv-core,1.31ms,2.18MB,4.57K,8.06K,26.4K,584K,396K
+nfl.csv,zcsv,1.27ms,799KB,18.2K,897,24.1K,2.57M,1.31M
+nfl.csv,zsc,2.86ms,1.80MB,22.4K,7.91K,46.6K,14.8M,4.02M
+nfl.csv,lazycsv,3.55ms,4.71MB,47.2K,19.2K,109K,15.2M,4.85M
+nfl.csv,simd-csv,2.59ms,2.22MB,28.9K,9.12K,55.3K,9.21M,2.73M
+nfl.csv,csv-core,7.59ms,2.09MB,28.0K,9.24K,52.1K,40.1M,14.1M
+worldcitiespop.csv,zcsv,1.28ms,819KB,23.3K,696,17.2K,2.53M,1.46M
+worldcitiespop.csv,zsc,2.80ms,1.78MB,24.0K,7.76K,38.8K,13.4M,3.59M
+worldcitiespop.csv,lazycsv,3.73ms,4.39MB,78.1K,19.5K,97.3K,12.3M,5.26M
+worldcitiespop.csv,simd-csv,2.94ms,2.21MB,26.0K,8.85K,43.0K,11.6M,3.19M
+worldcitiespop.csv,csv-core,5.88ms,2.08MB,57.3K,9.13K,43.8K,31.3M,11.4M
+mbta-stop-times.csv,zcsv,1.29ms,819KB,4.90K,617,13.5K,5.84M,1.46M
+mbta-stop-times.csv,zsc,2.64ms,1.78MB,10.5K,7.46K,34.3K,13.5M,3.66M
+mbta-stop-times.csv,lazycsv,2.77ms,4.12MB,31.4K,19.5K,89.8K,10.1M,3.26M
+mbta-stop-times.csv,simd-csv,2.78ms,2.19MB,11.8K,8.88K,39.8K,13.1M,3.55M
+mbta-stop-times.csv,csv-core,4.61ms,2.10MB,17.7K,8.58K,39.9K,22.6M,7.38M
+game.csv,zcsv,4.74ms,823KB,552,1.42K,45.2K,34.9M,8.66M
+game.csv,zsc,10.0ms,1.71MB,4.07K,9.56K,77.5K,90.5M,21.7M
+game.csv,lazycsv,4.79ms,5.92MB,15.8K,21.8K,148K,35.8M,8.03M
+game.csv,simd-csv,10.4ms,2.22MB,8.18K,9.35K,79.7K,97.1M,21.6M
+game.csv,csv-core,12.0ms,2.10MB,5.22K,9.64K,73.6K,96.6M,25.5M

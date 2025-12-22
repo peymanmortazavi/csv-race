@@ -1,0 +1,6 @@
+data/gen
+pyenv
+count_fields
+target/
+.zig-cache
+zig-out

@@ -1,0 +1,13 @@
+[package]
+name = "count_fields"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+csv-core = "0.1.13"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+strip = true

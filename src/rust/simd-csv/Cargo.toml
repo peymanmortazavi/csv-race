@@ -1,0 +1,7 @@
+[package]
+name = "count_fields"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+simd-csv = "0.10.3"
