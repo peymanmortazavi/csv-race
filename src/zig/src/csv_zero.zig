@@ -1,5 +1,5 @@
 const std = @import("std");
-const zcsv = @import("zcsv");
+const csvz = @import("csvzero");
 
 pub fn main() !void {
     var it = std.process.args();
@@ -14,11 +14,11 @@ pub fn main() !void {
     var buffer: [64 * 1024]u8 = undefined;
     var reader = file.reader(&buffer);
     const file_reader = &reader.interface;
-    var csvit = zcsv.Iterator.init(file_reader);
+    var csvit = csvz.Iterator.init(file_reader);
     var sum: usize = 0;
     while (true) {
         const col = csvit.next() catch |err| switch (err) {
-            zcsv.Iterator.Error.EOF => break,
+            csvz.Iterator.Error.EOF => break,
             else => |e| return e,
         };
         _ = col;

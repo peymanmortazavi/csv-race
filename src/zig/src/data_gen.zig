@@ -1,5 +1,5 @@
 const std = @import("std");
-const zcsv = @import("zcsv");
+const csvz = @import("csvzero");
 
 const Writer = std.Io.Writer;
 
@@ -26,7 +26,7 @@ fn generate(ally: std.mem.Allocator, config: GenerationConfig) !void {
 
     var buffer: [64 * 1024]u8 = undefined;
     var file_writer = file.writer(&buffer);
-    var emitter = zcsv.Emitter.init(&file_writer.interface);
+    var emitter = csvz.Emitter.init(&file_writer.interface);
     emitter.use_crlf = config.crlf;
     var randomizer = std.Random.DefaultPrng.init(24);
 
