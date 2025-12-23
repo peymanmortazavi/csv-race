@@ -1,320 +1,351 @@
 # CSV Race
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+**CSV Race** is a benchmarking repository for comparing the performance characteristics of CSV parsers across different languages and implementations.
 
-A comprehensive benchmarking suite for CSV parsers across multiple programming languages. CSV Race helps parser authors optimize their implementations and helps developers choose the right CSV parser for their specific use case.
+This project was originally created to benchmark and fine-tune my own CSV parser, and to better understand how different parsers behave under a variety of real-world and synthetic workloads. Over time, it evolved into a more general framework for evaluating CSV parsers in a consistent and transparent way.
 
-## Overview
+The goal is twofold:
 
-CSV Race benchmarks CSV parsers from C, C++, Rust, Go, and Zig, measuring not just wall time but also CPU instructions, cache performance, branch predictions, and memory usage. The project provides test files of varying sizes and characteristics, tooling for running benchmarks, and automated visualization of results.
+- **For parser authors**: provide a reproducible environment to evaluate and improve performance.
+- **For users**: help identify parsers that best match their performance, memory, and workload requirements.
 
-## Features
+While this README highlights selected benchmark results, the repository also includes scripts and tooling that allow you to:
 
-- **Multi-Language Support**: Benchmarks parsers written in C, C++, Rust, Go, and Zig
-- **Comprehensive Metrics**: Measures wall time, peak RSS, CPU instructions, CPU cycles, cache behavior, and branch misses
-- **Diverse Test Cases**: Includes both real-world CSV files and generated files with controlled characteristics
-- **Automated Visualization**: Python scripts generate charts comparing parser performance
-- **Hardware Performance Counters**: Uses `perf` via [poop](https://github.com/andrewrk/poop) for accurate CPU-level metrics
-- **Extensible**: Easy to add your own parsers and test files
+- Add your own parsers
+- Generate custom datasets
+- Run benchmarks on your own machine
+- Produce your own charts and raw data
 
-## Table of Contents
+For details on running benchmarks yourself, see [Running the benchmarks](#running-the-benchmarks).
 
-- [Overview](#overview)
-- [Features](#features)
-- [Quick Start](#quick-start)
-- [Benchmark Methodology](#benchmark-methodology)
-  - [Task](#task)
-  - [Test Files](#test-files)
-  - [Metrics Collected](#metrics-collected)
-  - [Tooling](#tooling)
-  - [Data Visualization](#data-visualization)
-- [Benchmark Results](#benchmark-results)
-  - [Wall Time](#wall-time)
-  - [Peak RSS](#peak-rss)
-  - [Branch Misses](#branch-misses)
-  - [Cache Misses & References](#cache-misses--references)
-- [Running the Benchmarks](#running-the-benchmarks)
-  - [Prerequisites](#prerequisites)
-  - [Building Parsers](#building-parsers)
-  - [Running Tests](#running-tests)
-- [Contributing](#contributing)
-- [Related Projects](#related-projects)
-- [License](#license)
+This repository was used extensively during the development of
+👉 [csv-zero](https://github.com/peymanmortazavi/csv-zero) and proved invaluable throughout that process.
 
-## Quick Start
+> **Before diving into the charts**, I strongly recommend reading the
+> [Benchmark Methodology](#benchmark-methodology) section to understand what is — and is not — being measured.
 
-```bash
-# Build all parsers
-make build_all
-
-# Run benchmarks with poop (Linux only)
-make poop TEST_FILE=data/game.csv
-
-# Generate visualizations
-python generate_charts.py
-```
-
-> **Note**: Before diving into the results, please read the [Benchmark Methodology](#benchmark-methodology) section to understand how tests are conducted and what the metrics represent.
+---
 
 ## Benchmark Methodology
 
-**Important Disclaimer**: While these benchmarks test libraries across various file sizes and characteristics, they should not be your sole decision-making criterion. Different parsers may:
-- Handle your specific use cases better
-- Offer unique features or utilities not available elsewhere
-- Perform differently in your execution environment
-- Provide better APIs or ergonomics for your needs
+Benchmarks are easy to misinterpret and easy to get wrong. While this repository aims to be careful and transparent, **you should not make decisions solely based on the charts shown here**.
 
-Even if performance is your primary concern, validate that these benchmarks reflect your specific requirements and environment.
+CSV parsers vary widely in:
 
-> **Feedback Welcome**: If you spot mistakes or want to suggest additional libraries, please open an issue or pull request.
+- Feature sets
+- API design
+- Error handling
+- Memory strategies
+- Suitability for specific workloads
 
-### Task
+Even if raw performance is your primary concern, you should verify that:
 
-This benchmark wants to focus on speed of iteration and not what consumers might want to do with that data. For this
-reason, each parser must iterate and count the number of fields in a CSV file as fast as it can using only `64 KB`
-buffer size. Some libraries might not provide a way to specify this, for those, we have not enforced a buffer size.
+- The benchmark matches your usage pattern
+- The input data resembles your real data
+- The execution environment is comparable to yours
+
+> I have made a best-effort attempt to choose representative test cases and to use each library as intended.
+> If you notice an issue, a mistake, or a missing library, contributions and corrections are very welcome.
+
+---
+
+### Task Definition
+
+The benchmark intentionally focuses on **iteration speed**, not downstream data processing.
+
+Each parser is required to:
+
+- Iterate through the entire CSV file
+- Count the total number of fields
+- Use a **64 KB input buffer** where configurable
+
+Some libraries do not expose buffer size controls; in those cases, the default behavior is used.
+
+This task isolates parsing overhead and minimizes the impact of allocation, data conversion, or user-level processing.
+
+---
 
 ### Test Files
 
-The benchmark suite includes two categories of test files:
+#### Real-world datasets
 
-#### Real-World Files
+After surveying commonly used CSV benchmark files, the following datasets were selected due to their diversity in size, structure, and quoting behavior:
 
-Four commonly-used CSV files that represent realistic data patterns:
 - `game.csv`
 - `gtfs-mbta-stop-times.csv`
 - `nfl.csv`
 - `worldcitiespop.csv`
 
-These files contain a mixture of quoted and non-quoted regions, escape characters, and varying sizes typical of production CSV data.
+These files include a mix of:
 
-#### Generated Files
+- Quoted and unquoted fields
+- Escaped characters
+- Varying row and column counts
 
-Synthetic files designed to test specific characteristics. File naming follows this format:
+They are reasonably representative of real-world CSV data.
+
+#### Generated datasets
+
+To explore additional edge cases and scalability, synthetic datasets are generated using the following naming scheme:
 
 ```
 <size>_<mix|no>_quotes_<column-count>_col_<min-field-size>_<max-field-size>.csv
 ```
 
-**Generation Method**: Each field is populated with randomly chosen printable ASCII characters (range 32-127). Field length is randomly selected between `min-field-size` and `max-field-size`. For `mix_quotes` files, special characters (`"`, `\`, `,`) may be included, causing the field to be properly quoted. For `no_quotes` files, these characters are excluded entirely.
+Where:
 
-**Available Generated Files**:
+- `size` indicates approximate file size
+- `col` indicates column count
+- Field contents are random printable ASCII characters (`32–127`)
+- Field length is randomly chosen in `[min-field-size, max-field-size]`
 
-| File | Size | Quotes | Columns | Field Size |
-|------|------|--------|---------|------------|
-| `xs_mix_quotes_12_col_0_32.csv` | ~1 KB | Mixed | 12 | 0-32 chars |
-| `xs_no_quotes_52_col_0_256.csv` | ~330 KB | None | 52 | 0-256 chars |
-| `m_mix_quotes_12_col_0_32.csv` | ~102 MB | Mixed | 12 | 0-32 chars |
-| `m_no_quotes_52_col_0_256.csv` | ~32 MB | None | 52 | 0-256 chars |
-| `xl_mix_quotes_2_col_0_12_many_rows.csv` | ~700 MB | Mixed | 2 | 0-12 chars |
-| `xl_no_quotes_52_col_0_256.csv` | ~3.2 GB | None | 52 | 0-256 chars |
-| `xl_mix_quotes_12_col_0_32.csv` | ~9.9 GB | Mixed | 12 | 0-32 chars |
+If quoting is disabled:
 
-### Metrics Collected
+- `"`, `\`, and `,` are excluded
 
-Beyond simple execution time, we capture detailed performance metrics:
+If quoting is enabled:
 
-| Metric | Description |
-|--------|-------------|
-| **Wall Time** | Total elapsed time to complete the task |
-| **Peak RSS** | Maximum resident set size (memory) occupied by the parser process |
-| **CPU Instructions** | Total machine-level instructions executed (independent of clock speed) |
-| **CPU Cycles** | Total CPU clock cycles, including execution and stalls (memory, branch resolution, etc.) |
-| **Cache References** | Number of memory accesses through the cache hierarchy |
-| **Cache Misses** | Failed cache lookups across all levels (primarily LLC misses) |
-| **Branch Misses** | Branch mispredictions by the CPU. See [Branch predictor](https://en.wikipedia.org/wiki/Branch_predictor) for details |
+- These characters may appear, and fields are quoted correctly when required
+
+Examples:
+
+- `xs_mix_quotes_12_col_0_32.csv` — ~1 KB, quoted, 12 columns
+- `xs_no_quotes_52_col_0_256.csv` — ~330 KB, unquoted, 52 columns
+- `m_mix_quotes_12_col_0_32.csv` — ~102 MB, quoted
+- `m_no_quotes_52_col_0_256.csv` — ~32 MB, unquoted
+- `xl_mix_quotes_2_col_0_12_many_rows.csv` — ~700 MB
+- `xl_no_quotes_52_col_0_256.csv` — ~3.2 GB
+- `xl_mix_quotes_12_col_0_32.csv` — ~9.9 GB
+
+---
+
+### Collected Metrics
+
+While wall-clock time is the most visible metric, several additional hardware-level metrics are captured to provide deeper insight:
+
+- **Wall Time**
+  Total elapsed time to complete the task.
+
+- **Peak RSS**
+  Maximum resident set size (memory usage) during execution.
+
+- **CPU Instructions**
+  Number of retired machine instructions, independent of clock speed.
+
+- **CPU Cycles**
+  Total cycles elapsed, including stalls and memory waits.
+
+- **Cache References**
+  Number of accesses through the CPU cache hierarchy.
+
+- **Cache Misses**
+  Cache misses across all cache levels (primarily LLC).
+
+- **Branch Misses**
+  Modern CPUs rely heavily on **branch prediction** to keep their pipelines full. Control-flow constructs such as `if`, `switch`, loops, and conditional jumps usually compile down to branch instructions unless the compiler can fully eliminate them.
+
+When the CPU encounters a branch, it **predicts** which path will be taken and begins executing instructions speculatively. If the prediction is correct, execution continues with little to no cost. If it is wrong, the CPU must **flush part of the pipeline and restart execution**, which incurs a noticeable performance penalty.
+
+A **branch miss** (or branch misprediction) occurs when the CPU’s prediction does not match the actual control flow.
+
+This matters for CSV parsing because:
+
+- Parsers often contain tight loops with many conditionals
+- Decisions depend on input data (e.g. quote handling, escape detection, delimiter checks)
+- Irregular or data-dependent patterns reduce predictability
+
+CSV files with:
+
+- Mixed quoted and unquoted fields
+- Escaped characters
+- Varying row and column lengths
+
+tend to produce less predictable branching behavior than uniform, unquoted data.
+
+---
 
 ### Tooling
 
-**Primary Tool**: [Poop](https://github.com/andrewrk/poop) (Linux only) - Uses `perf` to collect CPU and hardware performance counters.
+Benchmarks are primarily executed using:
 
-**Alternative**: [Hyperfine](https://github.com/sharkdp/hyperfine) (macOS/Windows) - Provides wall time measurements only. You can also use `perf` directly or platform-specific alternatives.
+- **[Poop](https://github.com/andrewrk/poop)**
+  A Linux-only benchmarking tool built on top of `perf`.
+
+On macOS or Windows:
+
+- **[Hyperfine](https://github.com/sharkdp/hyperfine)** can be used, but it only provides wall-time metrics.
+
+If you prefer, you may also use `perf` directly or substitute alternative tooling.
+
+---
 
 ### Data Visualization
 
-The included Python script (`generate_charts.py`) automates benchmark execution with `poop` and generates:
-- A CSV file containing all raw metrics
-- PNG charts for each metric in the `images/` directory
+A Python script orchestrates the benchmarks and generates:
 
-You can customize the script to use different tooling or adjust chart parameters.
+- A CSV file with all raw results
+- A set of charts for selected metrics
+
+The scripts are easily adaptable if you want to:
+
+- Use different tools
+- Add new metrics
+- Customize visualizations
+
+---
 
 ## Benchmark Results
 
-**Test Environment**:
-- CPU: AMD Ryzen 5 PRO 5650U with Radeon Graphics
-- Memory: 30 GB
-- OS: Linux 6.17.8-arch1-1
+> Benchmarks were run on:
+> **CPU**: AMD Ryzen 5 PRO 5650U
+> **Memory**: 30 GB
+> **OS**: Linux 6.17.8-arch1-1
 
-> **Note**: Results vary significantly across different CPUs and architectures. Contributions of benchmark data from other platforms are welcome!
+Results will vary significantly across machines and architectures.
+Contributions with data from other CPUs are very welcome.
 
-**About the Charts**:
-- Charts display the **top 5 parsers** to reduce visual noise
-- Focus primarily on the 4 real-world CSV files
-- Full raw data for all parsers and test cases is available in `result-all.csv`
+To reduce visual noise:
 
-**Parsers Benchmarked**:
-- **csv-zero** (Zig) - [Repository](https://github.com/peymanmortazavi/csv-zero)
-- **simdcsv** (Rust)
-- **csv** (Rust)
-- **csv-core** (Rust)
-- **zsv** (C)
-- **lazycsv** (C++)
-- And more (see `src/` directories)
+- Charts show only the **top 5 parsers**
+- Raw results for all parsers and test cases are available in `result-all.csv`
+- Charts focus primarily on the four common real-world datasets
+
+---
 
 ### Wall Time
 
-Wall time represents the actual elapsed time to complete parsing each CSV file.
+![CSV Parser Wall Time Comparison](images/wall_time.png)
 
-![CSV Parser Wall Time Comparison](images/wall_time.png "CSV Parser Wall Time Comparison")
+**Observations:**
 
-**Key Observations**:
+- SIMD-accelerated parsers (`simd-csv`, `zsv`, `csv-zero`) generally dominate, but show reduced advantage on `game.csv`
+- `zsc` performs exceptionally well overall but regresses noticeably on `game.csv`
+- `lazycpp` is the most consistent performer across datasets
+- Surprisingly, for `worldcitiespop.csv` (no quoted fields), some parsers (`csv (rust)`, `lazycsv (cpp)`) underperform
 
-- **SIMD Performance Characteristics**: SIMD-accelerated parsers (`simdcsv`, `zsv`, `csv-zero`) show reduced advantage on `game.csv` compared to other test files, though they still outperform non-SIMD parsers. The gap narrows significantly for this particular file.
+For large files:
 
-- **Consistency Winner**: `lazycsv` (C++) demonstrates the most stable performance across all test cases. While not always the fastest, it maintains consistently good times without dramatic variations.
+![CSV Parser Wall Time Comparison For Larger Files](images/wall_time_xl.png)
 
-- **Unexpected Patterns**: On `worldcitiespop.csv` (which contains no quoted regions), some parsers like `csv` (Rust) and `lazycsv` (C++) perform worse than expected, suggesting quoted field handling optimizations may affect unquoted parsing.
+Here, `zsc (c)`, `lazycsv (cpp)`, and `simdcsv-rust` remain consistently strong.
+`csv-zero` finishes first across all tested cases.
 
-#### Large File Performance
-
-![CSV Parser Wall Time Comparison For Larger Files](images/wall_time_xl.png "CSV Parser Wall Time Comparison For Larger Files")
-
-For larger files (XL test cases), performance rankings remain consistent:
-- **csv-zero** achieves first place across all large file tests
-- `zsv` (C), `lazycsv` (C++), and `simdcsv` (Rust) also deliver strong, consistent performance
+---
 
 ### Peak RSS
 
-Peak Resident Set Size (RSS) measures the maximum memory occupied by a process during execution.
+![CSV Parser Peak RSS Comparison](images/peak_rss.png)
 
-![CSV Parser Peak RSS Comparison](images/peak_rss.png "CSV Parser Peak RSS Comparison")
+Most top parsers exhibit stable memory usage regardless of file size.
+An exception is `lazycsv (cpp)`, which can consume gigabytes of memory on large inputs.
 
-**Key Observations**:
-
-- **Consistent Memory Usage**: Most top-5 parsers maintain similar memory footprints regardless of file size, indicating efficient streaming implementations.
-
-- **Exception**: `lazycsv` (C++) shows significantly higher memory usage that scales with file size. For XL test cases, it consumes gigabytes of memory, which may be problematic in memory-constrained environments.
-
-- **Production Suitability**: All other top parsers handle multi-gigabyte files with minimal memory overhead, making them suitable for resource-constrained scenarios.
+---
 
 ### Branch Misses
 
-Branch mispredictions occur when the CPU incorrectly predicts the outcome of conditional statements (`if`, `switch`, etc.). When a prediction fails, the CPU must discard speculative work and restart, causing performance penalties.
+![CSV Parser Branch Misses Comparison](images/branch_misses.png)
 
-Modern CPUs excel at predicting patterns, but unpredictable branches (like those in CSV parsing with varying quoted/unquoted fields) can cause significant slowdowns. Lower branch miss counts typically correlate with better wall-time performance.
+Branch mispredictions often correlate strongly with wall-time performance.
+Parsers with predictable control flow tend to perform better, especially on complex quoting patterns.
 
-![CSV Parser Branch Misses Comparison](images/branch_misses.png "CSV Parser Branch Misses Comparison")
+Parsers that rely on:
 
-**Analysis**: Parsers with fewer branch misses generally achieve better wall-time performance. SIMD-based approaches often reduce branching by processing data in parallel.
+- SIMD classification
+- Table-driven state machines
+- Branchless or low-branch designs
 
-### Cache Misses & References
+generally exhibit **fewer branch misses**, which often correlates strongly with lower wall-time.
 
-Cache performance significantly impacts parser speed. Cache references indicate memory accesses through the cache hierarchy, while cache misses represent failed lookups requiring slower main memory access.
+You can see this correlation by comparing parsers with low branch miss counts against their wall-time results in earlier charts. While branch misses are not the only factor affecting performance, they are frequently one of the dominant contributors in tight parsing loops.
 
-![CSV Parser Cache References Comparison](images/cache_references.png "CSV Parser Cache References Comparison")
-![CSV Parser Cache Misses Comparison](images/cache_misses.png "CSV Parser Cache Misses Comparison")
+---
 
-> Additional metrics (CPU cycles, instructions, etc.) are available in the `images/` directory and `result-all.csv`.
+### Cache Behavior
+
+![CSV Parser Cache References Comparison](images/cache_references.png)
+![CSV Parser Cache Misses Comparison](images/cache_misses.png)
+
+Additional metrics are available in the `images` directory and raw CSV outputs.
+
+---
 
 ## Running the Benchmarks
 
-### Prerequisites
+### Requirements
 
-**Required**:
-- C, C++, Rust, Go, and Zig compilers (or subset for specific parsers you want to test)
-- `make`
+- **Poop** (Linux) or **Hyperfine**
+- **Python + matplotlib** (for charts)
+- **Zig 0.15.2** (for `csv-zero` and data generation)
 
-**Benchmarking Tools** (choose one):
-- [Poop](https://github.com/andrewrk/poop) - Linux only, provides full metrics
-- [Hyperfine](https://github.com/sharkdp/hyperfine) - Cross-platform, wall-time only
-
-**Optional**:
-- Python 3 + matplotlib - For generating visualizations
-- Zig 0.15.2 - Required for building `csv-zero` and generating test data
+---
 
 ### Building Parsers
 
-All parser implementations are in the `src/` directory, organized by language:
-```
-src/
-├── c/        # C implementations
-├── cpp/      # C++ implementations
-├── go/       # Go implementations
-├── rust/     # Rust implementations
-└── zig/      # Zig implementations (includes data_gen.zig for test data)
-```
+All parsers live under `src/`.
 
-**Build all parsers**:
-```bash
+The only exception is:
+
+- `src/zig/src/data_gen.zig` — used for generating test data
+
+To build everything:
+
+```sh
 make build_all
 ```
 
-**Notes**:
-- You can selectively build/test parsers by modifying Makefile targets
-- Most C++ parsers are header-only libraries
-- Rust parsers use Cargo for dependency management
-- `zsv` (C) requires building from source (follow their repository instructions)
+This requires:
 
-### Running Tests
+- C
+- C++
+- Rust
+- Go
+- Zig
 
-#### Quick Test (Single File)
+You are free to remove parsers you don’t care about or add your own.
+`zsc (c)` requires a manual build but is straightforward if you follow its upstream instructions.
 
-Using Poop (Linux):
-```bash
-make poop TEST_FILE=data/game.csv
-```
+---
 
-Using Hyperfine (Cross-platform):
-```bash
-make hyperfine TEST_FILE=data/game.csv
-```
+### Selecting Parsers and Test Files
 
-#### Generate Full Benchmark Report
+You can customize:
 
-Run all tests and generate visualizations:
-```bash
-python generate_charts.py
-```
+- Which parsers participate
+- Which test files are used
+- Which metrics are collected
 
-This creates:
-- `output.csv` - Raw benchmark data
-- `images/*.png` - Performance comparison charts
+---
 
-#### Custom Test Files
+### Data Visualization
 
-You can benchmark with your own CSV files:
-```bash
-# Using poop
-make poop TEST_FILE=/path/to/your/file.csv
+`generate_charts.py`:
 
-# Using hyperfine
+- Runs benchmarks using `poop`
+- Produces `output.csv`
+- Writes figures to `images/`
+
+macOS support is not yet available here.
+
+---
+
+### Hyperfine / Manual Runs
+
+If `poop` is unavailable, you can still run benchmarks manually:
+
+```sh
 make hyperfine TEST_FILE=/path/to/your/file.csv
 ```
 
-#### Customizing Parsers and Test Cases
+Adjust the Makefile targets to control which parsers and tools are used.
 
-Edit `generate_charts.py` to:
-- Select which parsers to benchmark
-- Choose specific test files
-- Adjust chart parameters
-- Use different benchmarking tools
+---
 
-## Contributing
+If you’d like, I can also:
 
-Contributions are welcome! You can help by:
+- Tighten this further for GitHub skimmability
+- Add a “Supported Parsers” table
+- Add contribution guidelines
+- Add a “How to add your parser” section
+- Rewrite it in a more academic / paper-style tone
 
-- Adding parsers from other languages or alternative implementations
-- Providing benchmark results from different CPU architectures
-- Improving test coverage with new CSV file types
-- Enhancing visualization scripts
-- Fixing bugs or improving documentation
-
-Please open an issue or pull request on the repository.
-
-## Related Projects
-
-- [csv-zero](https://github.com/peymanmortazavi/csv-zero) - High-performance CSV parser for Zig
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+Just say the word.
