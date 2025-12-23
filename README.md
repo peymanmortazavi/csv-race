@@ -144,23 +144,23 @@ While wall-clock time is the most visible metric, several additional hardware-le
 - **Branch Misses**
   Modern CPUs rely heavily on **branch prediction** to keep their pipelines full. Control-flow constructs such as `if`, `switch`, loops, and conditional jumps usually compile down to branch instructions unless the compiler can fully eliminate them.
 
-When the CPU encounters a branch, it **predicts** which path will be taken and begins executing instructions speculatively. If the prediction is correct, execution continues with little to no cost. If it is wrong, the CPU must **flush part of the pipeline and restart execution**, which incurs a noticeable performance penalty.
+  When the CPU encounters a branch, it **predicts** which path will be taken and begins executing instructions speculatively. If the prediction is correct, execution continues with little to no cost. If it is wrong, the CPU must **flush part of the pipeline and restart execution**, which incurs a noticeable performance penalty.
 
-A **branch miss** (or branch misprediction) occurs when the CPU’s prediction does not match the actual control flow.
+  A **branch miss** (or branch misprediction) occurs when the CPU’s prediction does not match the actual control flow.
 
-This matters for CSV parsing because:
+  This matters for CSV parsing because:
 
-- Parsers often contain tight loops with many conditionals
-- Decisions depend on input data (e.g. quote handling, escape detection, delimiter checks)
-- Irregular or data-dependent patterns reduce predictability
+  - Parsers often contain tight loops with many conditionals
+  - Decisions depend on input data (e.g. quote handling, escape detection, delimiter checks)
+  - Irregular or data-dependent patterns reduce predictability
 
-CSV files with:
+  CSV files with:
 
-- Mixed quoted and unquoted fields
-- Escaped characters
-- Varying row and column lengths
+  - Mixed quoted and unquoted fields
+  - Escaped characters
+  - Varying row and column lengths
 
-tend to produce less predictable branching behavior than uniform, unquoted data.
+  tend to produce less predictable branching behavior than uniform, unquoted data.
 
 ---
 
