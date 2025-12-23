@@ -112,7 +112,7 @@ Generated test files:
 | file                                     | size   | quote/escape mode      | columns    | field length |
 | ---------------------------------------- | ------ | ---------------------- | ---------- | ------------ |
 | `xs_mix_quotes_12_col_0_32.csv`          | ~1 KB  | Contains quoted fields | 12         | 0-32         |
-| `xs_no_quotes_52_col_0_256.csv`          | ~102 M | No quoted fields       | 52         | 0-256        |
+| `xs_no_quotes_52_col_0_256.csv`          | ~333 K | No quoted fields       | 52         | 0-256        |
 | `m_mix_quotes_12_col_0_32.csv`           | ~102 M | Contains quoted fields | 12         | 0-32         |
 | `m_no_quotes_52_col_0_256.csv`           | ~32 M  | No quoted fields       | 52         | 0-256        |
 | `xl_mix_quotes_2_col_0_12_many_rows.csv` | ~700 M | Contains quoted fields | 2 columns  | 0-12         |

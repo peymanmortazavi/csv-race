@@ -9,11 +9,11 @@ BAR_CHART = True
 TEST_FILES = [
     # {
     #     'path': './data/gen/xs_mix_quotes_12_col_0_32.csv',
-    #     'name': 'XS Mix Quotes, 12 col, 0-32 chars',
+    #     'name': '(~1 KB) Mix Quotes, 12 col, 0-32 chars',
     # },
     # {
     #     'path': './data/gen/xs_no_quotes_52_col_0_256.csv',
-    #     'name': 'XS No Quotes, 52 col, 0-256 chars',
+    #     'name': '(~333 K) No Quotes, 52 col, 0-256 chars',
     # },
     # {
     #     'path': './data/gen/m_mix_quotes_12_col_0_32.csv',
@@ -21,19 +21,19 @@ TEST_FILES = [
     # },
     # {
     #     'path': './data/gen/m_no_quotes_52_col_0_256.csv',
-    #     'name': 'M No Quotes, 52 col, 0-256 chars',
+    #     'name': '(~ 32 M) No Quotes, 52 col, 0-256 chars',
     # },
     # {
     #     'path': './data/gen/xl_mix_quotes_12_col_0_32.csv',
-    #     'name': 'XL Mix Quotes, 12 col, 0-32 chars',
+    #     'name': '(~9.9 G) Mix Quotes, 12 col, 0-32 chars',
     # },
     # {
     #     'path': './data/gen/xl_mix_quotes_2_col_0_12_many_rows.csv',
-    #     'name': 'XL Mix Quotes, 2 col, 0-12 chars, many rows',
+    #     'name': '(~696 M) Mix Quotes, 2 col, 0-12 chars many rows',
     # },
     # {
     #     'path': './data/gen/xl_no_quotes_52_col_0_256.csv',
-    #     'name': 'XL No Quotes, 52 col, 0-256 chars',
+    #     'name': '(~3.2 G) No Quotes, 52 col, 0-256 chars',
     # },
     {'path': './data/nfl.csv', 'name': 'nfl.csv'},
     {'path': './data/worldcitiespop.csv', 'name': 'worldcitiespop.csv'},
