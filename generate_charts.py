@@ -5,15 +5,15 @@ import subprocess
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter
 
-
+BAR_CHART = True
 TEST_FILES = [
     # {
     #     'path': './data/gen/xs_mix_quotes_12_col_0_32.csv',
-    #     'name': 'XS Mix Quotes, 12 col, 0-32 chars',
+    #     'name': '(~1 KB) Mix Quotes, 12 col, 0-32 chars',
     # },
     # {
     #     'path': './data/gen/xs_no_quotes_52_col_0_256.csv',
-    #     'name': 'XS No Quotes, 52 col, 0-256 chars',
+    #     'name': '(~333 K) No Quotes, 52 col, 0-256 chars',
     # },
     # {
     #     'path': './data/gen/m_mix_quotes_12_col_0_32.csv',
@@ -21,43 +21,35 @@ TEST_FILES = [
     # },
     # {
     #     'path': './data/gen/m_no_quotes_52_col_0_256.csv',
-    #     'name': 'M No Quotes, 52 col, 0-256 chars',
+    #     'name': '(~ 32 M) No Quotes, 52 col, 0-256 chars',
     # },
     # {
     #     'path': './data/gen/xl_mix_quotes_12_col_0_32.csv',
-    #     'name': 'XL Mix Quotes, 12 col, 0-32 chars',
+    #     'name': '(~9.9 G) Mix Quotes, 12 col, 0-32 chars',
     # },
     # {
     #     'path': './data/gen/xl_mix_quotes_2_col_0_12_many_rows.csv',
-    #     'name': 'XL Mix Quotes, 2 col, 0-12 chars, many rows',
+    #     'name': '(~696 M) Mix Quotes, 2 col, 0-12 chars many rows',
     # },
     # {
     #     'path': './data/gen/xl_no_quotes_52_col_0_256.csv',
-    #     'name': 'XL No Quotes, 52 col, 0-256 chars',
+    #     'name': '(~3.2 G) No Quotes, 52 col, 0-256 chars',
     # },
-    {
-        'path': './data/nfl.csv',
-        'name': 'nfl.csv',
-    },
-    {
-        'path': './data/worldcitiespop.csv',
-        'name': 'worldcitiespop.csv',
-    },
-    {
-        'path': './data/gtfs-mbta-stop-times.csv',
-        'name': 'mbta-stop-times.csv',
-    },
-    {
-        'path': './data/game.csv',
-        'name': 'game.csv',
-    },
+    {'path': './data/nfl.csv', 'name': 'nfl.csv'},
+    {'path': './data/worldcitiespop.csv', 'name': 'worldcitiespop.csv'},
+    {'path': './data/gtfs-mbta-stop-times.csv', 'name': 'mbta-stop-times.csv'},
+    {'path': './data/game.csv', 'name': 'game.csv'},
 ]
 PARSERS = [
-    {'name': 'zcsv (zig)', 'path':  './src/zig/zig-out/bin/zcsv', 'bar_color': '#EBB101'},
+    {'name': 'csv-zero (zig)', 'path':  './src/zig/zig-out/bin/csvzero', 'bar_color': '#EBB101'},
     {'name': 'zsc (c)', 'path': './src/c/zsv/count_fields', 'bar_color': '#9AC3B4'},
     {'name': 'lazycsv (cpp)', 'path':  './src/cpp/lazycsv/count_fields', 'bar_color': '#9A89B3'},
     {'name': 'simd-csv (rust)', 'path':  './src/rust/simd-csv/target/release/count_fields', 'bar_color': '#90ACC2'},
     {'name': 'csv (rust)', 'path':  './src/rust/csv/target/release/count_fields', 'bar_color': '#C69B9C'},
+    # {'name': 'csv-parser (cpp)', 'path':  './src/cpp/csv-parser/count_fields', 'bar_color': '#7ADC70'},
+    # {'name': 'rapidcsv (cpp)', 'path':  './src/cpp/rapidcsv/count_fields', 'bar_color': '#2787F4'},
+    # {'name': 'csv (go)', 'path':  './src/go/count_fields', 'bar_color': '#F51200'},
+    # {'name': 'csv-core (rust)', 'path':  './src/rust/csv_core/target/release/count_fields', 'bar_color': '#029428'},
 ]
 POOP_PATH = '/home/peyman/Downloads/x86_64-linux-poop'
 
@@ -200,6 +192,7 @@ def create_charts(tests: dict):
                 val = metric_details['parse_func'](info[metric])
                 test_data[parser].append(val)
 
+        plt.rcParams.update({'font.size': 18})
         fig, ax = plt.subplots(layout='constrained', figsize=(20, 12))
         height = 0.14
         num_parsers = len(test_data)
@@ -210,23 +203,33 @@ def create_charts(tests: dict):
             name = parser['name']
             values = test_data[name]
             # Offset each parser's bars so they stack next to each other
-            offset = (index - num_parsers/2 + 0.5) * height
-            y_pos = [y + offset for y in y_positions]
-            rects = ax.barh(y_pos, values,
-                            height=height,
-                            label=name,
-                            color=parser['bar_color'],
-                            edgecolor='#333',
-                            linewidth=0.5)
-            ax.bar_label(rects, padding=3, fmt=metric_details['display_func'])
-            index += 1
+            if BAR_CHART:
+                offset = (index - num_parsers/2 + 0.5) * height
+                y_pos = [y + offset for y in y_positions]
+                rects = ax.barh(y_pos, values,
+                                height=height,
+                                label=name,
+                                color=parser['bar_color'],
+                                edgecolor='#333',
+                                linewidth=0.5)
+                ax.bar_label(rects, padding=3, fmt=metric_details['display_func'], fontsize=12)
+                index += 1
+            else:
+                ax.plot(test_names, values, '-x', color=parser['bar_color'])
 
-        ax.set_yticks(y_positions)
-        ax.set_yticklabels(test_names)
-        ax.set_xlabel(metric_details['x'])
-        ax.set_ylabel("Test Files")
+        if BAR_CHART:
+            ax.set_yticks(y_positions)
+            ax.set_yticklabels(test_names)
+            ax.set_xlabel(metric_details['x'])
+            ax.set_ylabel("Test Files")
+            ax.xaxis.set_major_formatter(FuncFormatter(metric_details['display_func']))
+        else:
+            ax.set_xticks(y_positions)
+            ax.set_xticklabels(test_names)
+            ax.set_ylabel(metric_details['x'])
+            ax.set_xlabel("Test Files")
+            ax.yaxis.set_major_formatter(FuncFormatter(metric_details['display_func']))
         ax.set_title(metric_details['title'])
-        ax.xaxis.set_major_formatter(FuncFormatter(metric_details['display_func']))
         plt.gcf().set_dpi(200)
         plt.legend(test_data.keys())
         plt.savefig(f'images/{metric}.png')

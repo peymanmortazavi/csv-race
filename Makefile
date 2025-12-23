@@ -18,7 +18,7 @@ hyperfine:
 		"./src/rust/csv/target/release/count_fields ${TEST_FILE}" \
 		"./src/rust/csv_core/target/release/count_fields ${TEST_FILE}" \
 		"./src/rust/simd-csv/target/release/count_fields ${TEST_FILE}" \
-		"./src/zig/zig-out/bin/zcsv ${TEST_FILE}" \
+		"./src/zig/zig-out/bin/csvzero ${TEST_FILE}" \
 		"./src/c/zsv/count_fields ${TEST_FILE}" \
 		"./src/cpp/csv-parser/count_fields ${TEST_FILE}" \
 		"./src/cpp/lazycsv/count_fields ${TEST_FILE}" \
@@ -30,7 +30,7 @@ poop:
 		"./src/rust/csv/target/release/csv-race ${TEST_FILE}" \
 		"./src/rust/csv_core/target/release/csv_race ${TEST_FILE}" \
 		"./src/rust/simd-csv/target/release/csv-race ${TEST_FILE}" \
-		"./src/zig/zig-out/bin/zcsv ${TEST_FILE}" \
+		"./src/zig/zig-out/bin/csvzero ${TEST_FILE}" \
 		"./src/c/zsv/count_fields ${TEST_FILE}" \
 		"./src/cpp/csv-parser/count_fields ${TEST_FILE}" \
 		"./src/cpp/lazycsv/count_fields ${TEST_FILE}" \
@@ -42,7 +42,7 @@ test:
 		./src/rust/csv/target/release/csv-race ${TEST_FILE}
 		./src/rust/csv_core/target/release/csv_race ${TEST_FILE}
 		./src/rust/simd-csv/target/release/csv-race ${TEST_FILE}
-		./src/zig/zig-out/bin/zcsv ${TEST_FILE}
+		./src/zig/zig-out/bin/csvzero ${TEST_FILE}
 		./src/c/zsv/count_fields ${TEST_FILE}
 		./src/cpp/csv-parser/count_fields ${TEST_FILE}
 		./src/cpp/lazycsv/count_fields ${TEST_FILE}
