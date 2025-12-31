@@ -5,8 +5,8 @@
     .minimum_zig_version = "0.15.2",
     .dependencies = .{
         .csvzero = .{
-            .url = "git+https://github.com/peymanmortazavi/csv-zero#27fb3b8e1cbe2900d64d25e74399688d526f19e7",
-            .hash = "csvzero-0.1.0-YQXXvIpwAAAEwERtbKme8T32p3tshcdzZslK_T1Xfblb",
+            .url = "git+https://github.com/peymanmortazavi/csv-zero.git#d6c4b94e1ada261109767b8cfd5939dfd97b4b6e",
+            .hash = "csvzero-0.1.0-YQXXvDWgAAB7IWjGo_xhnCgpPlf8xmplrxG81_OYPdJt",
         },
     },
     .paths = .{
