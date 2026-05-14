@@ -2,7 +2,7 @@
     .name = .zig,
     .version = "0.0.0",
     .fingerprint = 0xc1ce1081eaf7b24a,
-    .minimum_zig_version = "0.15.2",
+    .minimum_zig_version = "0.16.0",
     .dependencies = .{
         .csvzero = .{
             .url = "git+https://github.com/peymanmortazavi/csv-zero#733f2a0df745dee3e8dfd738757cbdec284254d1",
