@@ -20,12 +20,12 @@ const QuoteMode = enum {
     Random,
 };
 
-fn generate(ally: std.mem.Allocator, config: GenerationConfig) !void {
-    const file = try std.fs.cwd().createFile(config.file_name, .{ .truncate = true });
-    defer file.close();
+fn generate(io: std.Io, ally: std.mem.Allocator, config: GenerationConfig) !void {
+    const file = try std.Io.Dir.cwd().createFile(io, config.file_name, .{ .truncate = true });
+    defer file.close(io);
 
     var buffer: [64 * 1024]u8 = undefined;
-    var file_writer = file.writer(&buffer);
+    var file_writer = file.writer(io, &buffer);
     var emitter = csvz.Emitter.init(&file_writer.interface);
     emitter.use_crlf = config.crlf;
     var randomizer = std.Random.DefaultPrng.init(24);
@@ -63,7 +63,7 @@ fn random_string(randomizer: *std.Random.Xoshiro256, len: usize, mode: QuoteMode
     return buffer[0..index];
 }
 
-pub fn main() !void {
+pub fn main(init: std.process.Init) !void {
     const configs: []const GenerationConfig = &.{
         .{
             .file_name = "data/gen/xs_no_quotes_52_col_0_256.csv",
@@ -133,7 +133,7 @@ pub fn main() !void {
     const ally = std.heap.smp_allocator;
 
     for (configs) |config| {
-        generate(ally, config) catch |err| {
+        generate(init.io, ally, config) catch |err| {
             std.log.err("failed to generate {s}: {s}", .{ config.file_name, @errorName(err) });
             continue;
         };

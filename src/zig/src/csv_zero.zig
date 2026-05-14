@@ -1,8 +1,8 @@
 const std = @import("std");
 const csvz = @import("csvzero");
 
-pub fn main() !void {
-    var it = std.process.args();
+pub fn main(init: std.process.Init) !void {
+    var it = init.minimal.args.iterate();
     _ = it.skip();
 
     const file_path = it.next() orelse {
@@ -10,9 +10,9 @@ pub fn main() !void {
         std.process.exit(1);
     };
 
-    var file = try std.fs.cwd().openFile(file_path, .{ .mode = .read_only });
+    var file = try std.Io.Dir.cwd().openFile(init.io, file_path, .{ .mode = .read_only });
     var buffer: [64 * 1024]u8 = undefined;
-    var reader = file.reader(&buffer);
+    var reader = file.reader(init.io, &buffer);
     const file_reader = &reader.interface;
     var csvit = csvz.Iterator.init(file_reader);
     var sum: usize = 0;
