@@ -1,6 +1,5 @@
 use std::env;
 use std::fs::File;
-use std::io::BufReader;
 
 use csv::{ReaderBuilder, ByteRecord};
 
@@ -12,9 +11,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .expect("usage: csv_cell_count <file.csv>");
 
     let file = File::open(path)?;
-    let reader = BufReader::with_capacity(BUF_SIZE, file);
 
-    let mut csv = ReaderBuilder::new().has_headers(false).from_reader(reader);
+    let mut csv = ReaderBuilder::new().buffer_capacity(BUF_SIZE).has_headers(false).from_reader(file);
 
     let mut record = ByteRecord::new();
     let mut total_cells: u64 = 0;
